@@ -13,7 +13,7 @@ pygame.display.set_caption("Bootleg Mario")
 
 WIDTH, HEIGHT = 800, 600
 FPS = 60
-PLAYER_VELOCITY = 5
+PLAYER_VELOCITY = 1
 
 window =  pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -45,7 +45,7 @@ class Player(pygame.sprite.Sprite):
 
     def move_right(self, velocity):
         """Moves to the right of the screen"""
-        self.y_velocity = velocity
+        self.x_velocity = velocity
         if self.direction != "right":
             self.direction = "right"
             self.animation_count = 0
@@ -82,6 +82,18 @@ def draw_tiles(window, background, background_image, player):
 
     pygame.display.update()  # keeps the screen updated
 
+def handle_move(player):
+    """Function to determine how to control the movement of the player"""
+    keys = pygame.key.get_pressed()
+
+    player.x_velocity = 0
+    if keys[pygame.K_LEFT]:
+        player.move_left(PLAYER_VELOCITY)
+
+    if keys[pygame.K_RIGHT]:
+        player.move_right(PLAYER_VELOCITY)
+
+
 
 def main(window):
     """Main function which when it runs the game starts"""
@@ -99,6 +111,8 @@ def main(window):
                 run = False
                 break
 
+        player.loop(FPS)
+        handle_move(player)
         draw_tiles(window, background, background_image, player)
 
 
