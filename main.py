@@ -13,14 +13,15 @@ pygame.display.set_caption("Bootleg Mario")
 
 WIDTH, HEIGHT = 800, 600
 FPS = 60
-PLAYER_VELOCITY = 3
+PLAYER_VELOCITY = 5
 
 window =  pygame.display.set_mode((WIDTH, HEIGHT))
 
 class Player(pygame.sprite.Sprite):
     """Class which contains the properties and actions
     for the player characters of the game."""
-    COLOR = (255, 0, 0)
+    COLOUR = (255, 0, 0)
+    GRAVITY = 1
 
     def __init__(self, x, y, width, height):
         self.rect = pygame.Rect(x, y, width, height)
@@ -28,6 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.mask = None
         self.direction = "left"
         self.animation_count = 0
+        self.fall_count = 0
 
 
     def move(self, dx, dy):
@@ -57,7 +59,6 @@ class Player(pygame.sprite.Sprite):
             self.direction = "down"
             self.animation_count = 0
 
-
     def move_up(self, velocity):
         """Moves to the right of the screen"""
         self.y_velocity = -velocity
@@ -67,12 +68,14 @@ class Player(pygame.sprite.Sprite):
 
     def loop(self, fps):
         """Move the character in the correct direction"""
+        self.y_velocity += min(1, (self.fall_count / fps) * self.GRAVITY)
         self.move(self.x_velocity, self.y_velocity)
 
+        self.fall_count += 1
 
     def draw_character(self, win):
         """Draws the character on the screen"""
-        pygame.draw.rect(win, self.COLOR, self.rect)
+        pygame.draw.rect(win, self.COLOUR, self.rect)
 
 
 def get_background(name):
