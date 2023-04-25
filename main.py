@@ -13,7 +13,7 @@ pygame.display.set_caption("Bootleg Mario")
 
 WIDTH, HEIGHT = 800, 600
 FPS = 60
-PLAYER_VELOCITY = 1
+PLAYER_VELOCITY = 3
 
 window =  pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -48,6 +48,21 @@ class Player(pygame.sprite.Sprite):
         self.x_velocity = velocity
         if self.direction != "right":
             self.direction = "right"
+            self.animation_count = 0
+
+    def move_down(self, velocity):
+        """Moves to the left of the screen"""
+        self.y_velocity = velocity
+        if self.direction != "down":
+            self.direction = "down"
+            self.animation_count = 0
+
+
+    def move_up(self, velocity):
+        """Moves to the right of the screen"""
+        self.y_velocity = -velocity
+        if self.direction != "up":
+            self.direction = "up"
             self.animation_count = 0
 
     def loop(self, fps):
@@ -87,11 +102,18 @@ def handle_move(player):
     keys = pygame.key.get_pressed()
 
     player.x_velocity = 0
+    player.y_velocity = 0
     if keys[pygame.K_LEFT]:
         player.move_left(PLAYER_VELOCITY)
 
     if keys[pygame.K_RIGHT]:
         player.move_right(PLAYER_VELOCITY)
+
+    if keys[pygame.K_UP]:
+        player.move_up(PLAYER_VELOCITY)
+    
+    if keys[pygame.K_DOWN]:
+        player.move_down(PLAYER_VELOCITY)
 
 
 
