@@ -1,11 +1,11 @@
-import os
-import random
-import math
-import pygame
+"""Platform game inspired by Mario Bros."""
 
 from os import listdir
 from os.path import isfile, join
 
+import pygame
+import random
+import math
 
 pygame.init()
 
@@ -17,11 +17,41 @@ PLAYER_VELOCITY = 5
 
 window =  pygame.display.set_mode((WIDTH, HEIGHT))
 
+def flip(sprites):
+    """Changes the rotation of the image"""
+    return [pygame.transform.flip(sprite, True, False) for sprite in sprites]
+
+def load_sprite_images(dir1, dir2, width, height, direction=False):
+    """Loads all the relevant pictures we need"""
+    path = join("assets", dir1, dir2)
+    images = [img for img in listdir(path) if isfile(join(path, img))]
+
+    sprites_coll = {}
+
+    for image in images:
+        sprite_sheet = pygame.image.load(join(path, image)).convert_alpha()
+
+        sprites = []
+        for i in range(sprite_sheet.get_width() // width):
+            surface = pygame.Surface((width, height), pygame.SRCALPHA, 32)
+            rect = pygame.Rect(i * width, 0, width, height)
+            surface.blit(sprite_sheet, (0,0), rect)  # draw the sprite on the designated surface
+            sprites.append(pygame.transform.scale2x(surface))
+
+        if direction:
+            sprites_coll[image.replace(".png", "") + "_right"] = sprites
+            sprites_coll[image.replace(".png", "") + "_left"] = flip(sprites)
+        else:
+            sprites_coll[image.replace(".png", "")] = sprites
+    
+    return sprites_coll
+
 class Player(pygame.sprite.Sprite):
     """Class which contains the properties and actions
     for the player characters of the game."""
     COLOUR = (255, 0, 0)
     GRAVITY = 1
+    SPRITES = load_sprite_images("main_characters", "PinkMan", 32, 32, True)
 
     def __init__(self, x, y, width, height):
         self.rect = pygame.Rect(x, y, width, height)
@@ -30,7 +60,6 @@ class Player(pygame.sprite.Sprite):
         self.direction = "left"
         self.animation_count = 0
         self.fall_count = 0
-
 
     def move(self, dx, dy):
         """Determines the displacements of the character"""
@@ -68,19 +97,19 @@ class Player(pygame.sprite.Sprite):
 
     def loop(self, fps):
         """Move the character in the correct direction"""
-        self.y_velocity += min(1, (self.fall_count / fps) * self.GRAVITY)
+        #  self.y_velocity += min(1, (self.fall_count / fps) * self.GRAVITY)
         self.move(self.x_velocity, self.y_velocity)
 
         self.fall_count += 1
 
-    def draw_character(self, win):
+    def draw_sprite(self, win):
         """Draws the character on the screen"""
-        pygame.draw.rect(win, self.COLOUR, self.rect)
-
+        self.sprite = self.SPRITES["idle_" + self.direction][0]
+        win.blit(self.sprite, (self.rect.x, self.rect.y))
 
 def get_background(name):
     """Loads the background images"""
-    image = pygame.image.load(join("background", name))
+    image = pygame.image.load(join("assets", "background", name))
     _,_, width, height = image.get_rect()
     tiles = []
 
@@ -96,7 +125,7 @@ def draw_tiles(window, background, background_image, player):
     for tile in background:
         window.blit(background_image, tuple(tile))  # tile contains x,y position
 
-    player.draw_character(window)
+    player.draw_sprite(window)
 
     pygame.display.update()  # keeps the screen updated
 
@@ -117,7 +146,6 @@ def handle_move(player):
     
     if keys[pygame.K_DOWN]:
         player.move_down(PLAYER_VELOCITY)
-
 
 
 def main(window):
