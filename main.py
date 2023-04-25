@@ -40,6 +40,8 @@ def load_sprite_images(dir1, dir2, width, height, direction=False):
 
         if direction:
             sprites_coll[image.replace(".png", "") + "_right"] = sprites
+            sprites_coll[image.replace(".png", "") + "_up"] = sprites
+            sprites_coll[image.replace(".png", "") + "_down"] = sprites
             sprites_coll[image.replace(".png", "") + "_left"] = flip(sprites)
         else:
             sprites_coll[image.replace(".png", "")] = sprites
@@ -73,7 +75,6 @@ class Player(pygame.sprite.Sprite):
             self.direction = "left"
             self.animation_count = 0
 
-
     def move_right(self, velocity):
         """Moves to the right of the screen"""
         self.x_velocity = velocity
@@ -97,7 +98,7 @@ class Player(pygame.sprite.Sprite):
 
     def loop(self, fps):
         """Move the character in the correct direction"""
-        #  self.y_velocity += min(1, (self.fall_count / fps) * self.GRAVITY)
+        self.y_velocity += min(1, (self.fall_count / fps) * self.GRAVITY)
         self.move(self.x_velocity, self.y_velocity)
 
         self.fall_count += 1
